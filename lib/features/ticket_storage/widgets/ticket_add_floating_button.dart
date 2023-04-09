@@ -19,6 +19,7 @@ class TicketAddFloatingButton extends StatelessWidget {
       // the response will be true. Otherwise, the response will be null.
       onPressed: () => _showAddTicketBottomSheet(context),
       label: const Text(AppStrings.addTicketButtonTitle),
+      heroTag: const ValueKey('addTicketButton'),
     );
   }
 

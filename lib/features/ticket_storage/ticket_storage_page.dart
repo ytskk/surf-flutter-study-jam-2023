@@ -9,8 +9,19 @@ class TicketStoragePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const TicketsAppBar(),
-      floatingActionButton: TicketAddFloatingButton(
-        onTicketAdded: _onTicketAdded,
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TicketAddFloatingButton(
+            onTicketAdded: _onTicketAdded,
+          ),
+          const SizedBox(width: 16),
+          FloatingActionButton.extended(
+            onPressed: () {},
+            label: const Text('Download all'),
+            heroTag: const ValueKey('download_all'),
+          ),
+        ],
       ),
       body: Scrollbar(
         child: GetX<TicketStorageController>(

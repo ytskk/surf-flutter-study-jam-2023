@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 import 'dart:isolate';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:surf_flutter_study_jam_2023/features/features.dart';
 
@@ -40,7 +43,32 @@ class _TicketTileState extends State<TicketTile> {
       child: Row(
         children: [
           Expanded(
-            child: Text(widget.ticket.filename),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(widget.ticket.filename),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOut,
+                  child: _downloadStatus == TicketDownloadStatus.downloading
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 8),
+                            LinearProgressIndicator(
+                              value: _downloadProgress.received /
+                                  _downloadProgress.total,
+                            ),
+                            Text(
+                              '${(_downloadProgress.received / 1024 / 1024).toStringAsFixed(2)} MB / ${(_downloadProgress.total / 1024 / 1024).toStringAsFixed(2)} MB',
+                            ),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
           ),
           const SizedBox(width: 16),
           _buildTrailing(),
@@ -57,6 +85,14 @@ class _TicketTileState extends State<TicketTile> {
         return IconButton(
           onPressed: () {
             // TODO: open pdf
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => PDFScreen(
+                  path: widget.ticket.filePath,
+                  title: widget.ticket.titlename,
+                ),
+              ),
+            );
           },
           icon: const Icon(Icons.arrow_forward_ios_rounded),
         );
@@ -136,11 +172,6 @@ Future<void> _downloadPdf(
 ) async {
   final dio = Dio();
 
-  log(
-    'Downloading pdf from $url to $filePath',
-    name: 'DownloadPdfMessage::_downloadPdf',
-  );
-
   await dio.download(
     url,
     filePath,
@@ -212,4 +243,106 @@ class DownloadProgress {
   final int received;
   final int total;
   final String filePath;
+}
+
+class PDFScreen extends StatefulWidget {
+  const PDFScreen({
+    super.key,
+    this.path,
+    required this.title,
+  });
+
+  final String? path;
+  final String title;
+
+  @override
+  _PDFScreenState createState() => _PDFScreenState();
+}
+
+class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
+  final Completer<PDFViewController> _controller =
+      Completer<PDFViewController>();
+  int? pages = 0;
+  int? currentPage = 0;
+  bool isReady = false;
+  String errorMessage = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Stack(
+        children: <Widget>[
+          PDFView(
+            filePath: widget.path,
+            enableSwipe: true,
+            swipeHorizontal: true,
+            autoSpacing: false,
+            pageFling: true,
+            pageSnap: true,
+            defaultPage: currentPage!,
+            fitPolicy: FitPolicy.BOTH,
+            preventLinkNavigation:
+                false, // if set to true the link is handled in flutter
+            onRender: (_pages) {
+              setState(() {
+                pages = _pages;
+                isReady = true;
+              });
+            },
+            onError: (error) {
+              setState(() {
+                errorMessage = error.toString();
+              });
+              print(error.toString());
+            },
+            onPageError: (page, error) {
+              setState(() {
+                errorMessage = '$page: ${error.toString()}';
+              });
+              print('$page: ${error.toString()}');
+            },
+            onViewCreated: (PDFViewController pdfViewController) {
+              _controller.complete(pdfViewController);
+            },
+            onLinkHandler: (String? uri) {
+              print('goto uri: $uri');
+            },
+            onPageChanged: (int? page, int? total) {
+              print('page change: $page/$total');
+              setState(() {
+                currentPage = page;
+              });
+            },
+          ),
+          errorMessage.isEmpty
+              ? !isReady
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Container()
+              : Center(
+                  child: Text(errorMessage),
+                )
+        ],
+      ),
+      floatingActionButton: FutureBuilder<PDFViewController>(
+        future: _controller.future,
+        builder: (context, AsyncSnapshot<PDFViewController> snapshot) {
+          if (snapshot.hasData) {
+            return FloatingActionButton.extended(
+              label: Text("Go to ${pages! ~/ 2}"),
+              onPressed: () async {
+                await snapshot.data!.setPage(pages! ~/ 2);
+              },
+            );
+          }
+
+          return Container();
+        },
+      ),
+    );
+  }
 }
