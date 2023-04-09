@@ -1,1 +1,2 @@
-export 'local_service/local_service.dart';
+export 'local_storage/local_storage.dart';
+export 'models/models.dart';

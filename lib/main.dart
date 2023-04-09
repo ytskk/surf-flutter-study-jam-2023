@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:surf_flutter_study_jam_2023/features/ticket_storage/ticket_storage_page.dart';
+import 'package:get/get.dart';
 
-void main() {
+import 'app.dart';
+import 'core/core.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await registerServices();
+
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+Future<void> registerServices() async {
+  // get and init local storage
+  final localStorageService = Get.put(LocalStorageService());
+  await localStorageService.init();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.light(useMaterial3: true),
-      home: const TicketStoragePage(),
-    );
-  }
+  Get.lazyPut(
+    () => LocalStorageController(
+      localStorageService: localStorageService,
+    ),
+  );
 }

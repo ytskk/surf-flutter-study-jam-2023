@@ -135,7 +135,7 @@ class _TicketsAddBottomSheetState extends State<TicketsAddBottomSheet> {
     if (_formKey.currentState!.validate()) {
       log('Ticket url: ${_controller.text}');
       // pop success status to the parent widget.
-      Navigator.of(context).pop(true);
+      Navigator.of(context).pop(_controller.text);
     }
   }
 
