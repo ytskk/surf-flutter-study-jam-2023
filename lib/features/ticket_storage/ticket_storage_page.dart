@@ -1,7 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:surf_flutter_study_jam_2023/constants/constants.dart';
+import 'package:get/get.dart';
 import 'package:surf_flutter_study_jam_2023/features/features.dart';
 
 class TicketStoragePage extends StatelessWidget {
@@ -11,50 +9,57 @@ class TicketStoragePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const TicketsAppBar(),
-      floatingActionButton: TicketAddFloatingButton(),
+      floatingActionButton: TicketAddFloatingButton(
+        onTicketAdded: _onTicketAdded,
+      ),
       body: Scrollbar(
-        child: ListView.builder(
-          itemCount: 20,
-          itemBuilder: (context, index) => TicketCardItem(
-            title: 'Ticket $index',
-          ),
+        child: GetX<TicketStorageController>(
+          init: TicketStorageController(),
+          builder: (controller) {
+            final tickets = controller.tickets.value;
+
+            return TicketsList(tickets: tickets);
+          },
         ),
       ),
     );
   }
+
+  void _onTicketAdded(ticketUrl) {
+    final ticket = TicketModel(
+      url: ticketUrl,
+    );
+    TicketStorageController.to.addTicket(ticket);
+  }
 }
 
-class TicketAddFloatingButton extends StatelessWidget {
-  const TicketAddFloatingButton({
+class TicketsList extends StatelessWidget {
+  const TicketsList({
     super.key,
+    required this.tickets,
   });
+
+  final List<TicketModel> tickets;
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton.extended(
-      // Awaits bottom sheet magic. If the user has added a ticket, then
-      // the response will be true. Otherwise, the response will be null.
-      onPressed: () => _showAddTicketBottomSheet(context),
-      label: const Text(AppStrings.addTicketButtonTitle),
-    );
-  }
-
-  Future<void> _showAddTicketBottomSheet(BuildContext context) async {
-    final result = await showModalBottomSheet<bool>(
-      context: context,
-      builder: (context) => const TicketsAddBottomSheet(),
-    );
-
-    if (result == null) {
-      return;
-    }
-
-    if (result) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(AppStrings.ticketAddedMessage),
-        ),
+    if (tickets.isEmpty) {
+      return const Center(
+        child: Text('No tickets'),
       );
     }
+
+    return ListView.builder(
+      itemCount: tickets.length,
+      itemBuilder: (context, index) {
+        final ticket = tickets[index];
+
+        return TicketTile(
+          key: ValueKey(ticket.id),
+          title: ticket.url,
+          downloadStatus: ticket.downloadStatus,
+        );
+      },
+    );
   }
 }
