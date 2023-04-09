@@ -23,6 +23,18 @@ class TicketStorageController extends GetxController {
     _tickets.add(ticket);
   }
 
+  void updateTicket(TicketModel ticket) {
+    final newTickets = _tickets.map((t) {
+      if (t.id == ticket.id) {
+        return ticket;
+      } else {
+        return t;
+      }
+    }).toList();
+
+    _tickets.value = newTickets;
+  }
+
   void removeTicket(TicketModel ticket) {
     _tickets.remove(ticket);
   }

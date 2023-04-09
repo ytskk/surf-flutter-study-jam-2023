@@ -18,7 +18,9 @@ class TicketStoragePage extends StatelessWidget {
           builder: (controller) {
             final tickets = controller.tickets.value;
 
-            return TicketsList(tickets: tickets);
+            return TicketsList(
+              tickets: tickets,
+            );
           },
         ),
       ),
@@ -55,9 +57,7 @@ class TicketsList extends StatelessWidget {
         final ticket = tickets[index];
 
         return TicketTile(
-          key: ValueKey(ticket.id),
-          title: ticket.url,
-          downloadStatus: ticket.downloadStatus,
+          ticket: ticket,
         );
       },
     );
