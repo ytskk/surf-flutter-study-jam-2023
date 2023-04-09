@@ -17,7 +17,9 @@ class TicketStoragePage extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           FloatingActionButton.extended(
-            onPressed: () {},
+            onPressed: () {
+              // TODO: download all.
+            },
             label: const Text('Download all'),
             heroTag: const ValueKey('download_all'),
           ),

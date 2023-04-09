@@ -21,7 +21,7 @@ class TicketsAppBar extends StatelessWidget with PreferredSizeWidget {
           onPressed: () {
             TicketStorageController.to.removeAllTickets();
           },
-          icon: Icon(Icons.delete),
+          icon: const Icon(Icons.delete),
         ),
       ],
     );

@@ -15,6 +15,7 @@ class LocalStorageController extends GetxController {
 
   // getters.
 
+  /// Loads tickets from local storage.
   List<TicketModel> getTickets() {
     final ticketsJson = _localStorageService.getString(
       LocalStorageKeys.tickets.name,

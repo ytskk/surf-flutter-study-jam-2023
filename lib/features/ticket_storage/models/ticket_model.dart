@@ -4,7 +4,6 @@ import 'package:uuid/uuid.dart';
 class TicketModel {
   TicketModel({
     String? id,
-    this.title = '',
     required this.url,
     this.downloadStatus = TicketDownloadStatus.notDownloaded,
     DateTime? createdAt,
@@ -15,7 +14,6 @@ class TicketModel {
   static const uuid = Uuid();
 
   final String id;
-  final String title;
   final String url;
   final TicketDownloadStatus downloadStatus;
   final DateTime createdAt;
@@ -35,7 +33,7 @@ class TicketModel {
 
   @override
   String toString() {
-    return 'TicketModel(title: $title, url: $url, downloadStatus: $downloadStatus, createdAt: $createdAt)';
+    return 'TicketModel(url: $url, downloadStatus: $downloadStatus, createdAt: $createdAt)';
   }
 
   TicketModel copyWith({
@@ -48,7 +46,6 @@ class TicketModel {
   }) {
     return TicketModel(
       id: id ?? this.id,
-      title: title ?? this.title,
       url: url ?? this.url,
       downloadStatus: downloadStatus ?? this.downloadStatus,
       createdAt: createdAt ?? this.createdAt,
@@ -59,7 +56,6 @@ class TicketModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'title': title,
       'url': url,
       'downloadStatus': downloadStatus.index,
       'createdAt': createdAt.toIso8601String(),
@@ -70,7 +66,6 @@ class TicketModel {
   factory TicketModel.fromJson(Map<String, dynamic> json) {
     return TicketModel(
       id: json['id'] as String,
-      title: json['title'] as String,
       url: json['url'] as String,
       downloadStatus:
           TicketDownloadStatus.values[json['downloadStatus'] as int],

@@ -15,8 +15,8 @@ class TicketAddFloatingButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(
-      // Awaits bottom sheet magic. If the user has added a ticket, then
-      // the response will be true. Otherwise, the response will be null.
+      // Awaits bottom sheet magic. If the user successfully added a url,
+      // then we call the callback.
       onPressed: () => _showAddTicketBottomSheet(context),
       label: const Text(AppStrings.addTicketButtonTitle),
       heroTag: const ValueKey('addTicketButton'),
@@ -34,7 +34,6 @@ class TicketAddFloatingButton extends StatelessWidget {
     }
 
     final url = result;
-
     onTicketAdded?.call(url);
   }
 }

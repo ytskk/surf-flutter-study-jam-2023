@@ -1,4 +1,4 @@
-// TODO: DI
+/// Checks if the given [url] is valid or not. Should start with http or https.
 bool isUrlValid(String url) {
   final urlPattern = RegExp(
     r'^(http(s)?:\/\/)?((w){3}.)?'
@@ -9,6 +9,7 @@ bool isUrlValid(String url) {
   return urlPattern.hasMatch(url);
 }
 
+/// Checks if the given [url] ends with .pdf.
 bool isUrlEndsWithPdf(String url) {
   final urlPattern = RegExp(r'\.pdf$');
 

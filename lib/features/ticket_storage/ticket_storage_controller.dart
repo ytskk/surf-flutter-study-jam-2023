@@ -43,10 +43,6 @@ class TicketStorageController extends GetxController {
     _tickets.clear();
   }
 
-  void sortTickets() {
-    _tickets.sort((a, b) => a.title.compareTo(b.title));
-  }
-
   void setSortOrder(TicketSortOrder sortOrder) {
     _sortOrder.value = sortOrder;
   }

@@ -26,7 +26,8 @@ class _TicketsAddBottomSheetState extends State<TicketsAddBottomSheet> {
     _controller = TextEditingController();
     _focusNode = FocusNode();
 
-    // set the clipboard content to the text field and move the cursor to the end.
+    /// Sets the clipboard content to the text field and move the cursor
+    /// to the end.
     _getClipboardContent().then((value) {
       if (value != null) {
         if (!validateTicketUrl(value)) {
